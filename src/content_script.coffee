@@ -68,8 +68,8 @@ checker_event = (e) ->
 change_color = (color) ->
   $("input[name='favorite-color'][value='#{color}']").click()
 
-circles.on 'click', (e) ->
-  window.open $(e.target).parent().attr('href') if $(e.target).parent().attr('href')
+circles.on 'click', 'a', (e) ->
+  window.open $(e.currentTarget).attr('href')
   e.preventDefault()
 
 cursor()
