@@ -30,16 +30,14 @@ $("body").on 'keydown',  (e) ->
     when "P"
       move_prev()
     when "J", "S", 40
-      console.log 'down'
-      # move_cursor "down"
+      move_next()
     when "K", "W", 38
-      console.log 'up'
-      # move_cursor "up"
+      move_prev()
     when "H", "A", 37
       move_cursor -1 # "left"
     when "L", "D", 39
       move_cursor +1 # "right"
-  #$("body").keydown checker_event
+  checker_event(e)
 
 move_next = ->
   window.location = pagination['next'] if pagination['next']
@@ -57,5 +55,15 @@ move_cursor = (dir) ->
   return move_next() if current >= circles.length
   cursor()
 
+checker_event = (e) ->
+  key = e.which
+  change_color(key - 48) if 49 <= key && key <= 57 # number
+  e.preventDefault()
+
+change_color = (color) ->
+  $("input[name='favorite-color'][value='#{color}']").click()
+
+circles.on 'click', (e) ->
+  e.preventDefault()
 
 cursor()
