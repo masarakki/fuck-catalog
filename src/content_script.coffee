@@ -64,6 +64,7 @@ change_color = (color) ->
   $("input[name='favorite-color'][value='#{color}']").click()
 
 circles.on 'click', (e) ->
+  window.open $(e.target).parent().attr('href')
   e.preventDefault()
 
 cursor()
