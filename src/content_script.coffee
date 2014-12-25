@@ -21,7 +21,7 @@ for link in $(".m-pagination-nav > a")
   pagination['prev'] = $(link).attr('href') if $(link).text() == '<前'
 
 
-$("body").on 'keydown',  (e) ->
+$("body").on 'keyup',  (e) ->
   key_code = e.which
   key_code = String.fromCharCode e.which unless key_code >= 37 && key_code <= 40
   switch key_code
@@ -57,14 +57,16 @@ move_cursor = (dir) ->
 
 checker_event = (e) ->
   key = e.which
-  change_color(key - 48) if 49 <= key && key <= 57 # number
-  e.preventDefault()
+  if 49 <= key && key <= 57 # number
+    change_color(key - 48)
+    e.preventDefault()
+    e.stopPropagation()
 
 change_color = (color) ->
   $("input[name='favorite-color'][value='#{color}']").click()
 
 circles.on 'click', (e) ->
-  window.open $(e.target).parent().attr('href')
+  window.open $(e.target).parent().attr('href') if $(e.garget).parent().attr('href')
   e.preventDefault()
 
 cursor()
