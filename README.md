@@ -4,7 +4,7 @@
 
 ## Build
 
-    npm install coffee
+    npm install coffee-script
     rake
 
 できたcrxを投げ入れる
