@@ -21,7 +21,7 @@ for link in $(".m-pagination-nav > a")
   pagination['prev'] = $(link).attr('href') if $(link).text() == '<前'
 
 
-$("body").on 'keyup',  (e) ->
+$("body").on 'keydown',  (e) ->
   key_code = e.which
   key_code = String.fromCharCode e.which unless key_code >= 37 && key_code <= 40
   switch key_code
@@ -38,6 +38,12 @@ $("body").on 'keyup',  (e) ->
     when "L", "D", 39
       move_cursor +1 # "right"
   checker_event(e)
+
+$('body').on 'keyup', (e) ->
+  key = e.which
+  if 49 <= key && key <= 57 # number
+    e.preventDefault()
+    e.stopPropagation()
 
 move_next = ->
   window.location = pagination['next'] if pagination['next']
@@ -57,10 +63,7 @@ move_cursor = (dir) ->
 
 checker_event = (e) ->
   key = e.which
-  if 49 <= key && key <= 57 # number
-    change_color(key - 48)
-    e.preventDefault()
-    e.stopPropagation()
+  change_color(key - 48) if 49 <= key && key <= 57 # number
 
 change_color = (color) ->
   $("input[name='favorite-color'][value='#{color}']").click()
