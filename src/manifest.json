@@ -1,0 +1,13 @@
+{
+    "name": "fuck catalog",
+    "version": "0.0.1",
+    "content_scripts": [
+        {
+            "matches": ["https://webcatalog.circle.ms/CircleRapid/*"],
+            "js": ["jquery.min.js", "content_script.js"],
+            "run_at": "document_end",
+            "all_frames": true
+        }
+    ],
+    "permissions": []
+}
