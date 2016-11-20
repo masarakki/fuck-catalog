@@ -66,7 +66,7 @@ $("body").on('keydown', e => {
 
 $('body').on('keyup', e => {
   const key = e.which;
-  if (49 <= key && key <= 57) { // number
+  if (48 <= key && key <= 57) { // number
     e.preventDefault();
     e.stopPropagation();
   }
@@ -100,10 +100,39 @@ const move_cursor = (dir) => {
   cursor();
 };
 
+const removeCheck = (target, current) => {
+  const event = new Event('contextmenu');
+  if (current !== 0) {
+    target.dispatchEvent(event);
+  }
+};
+
+const addCheck = (target, color, current) => {
+  const event = new Event('contextmenu');
+  change_color(color);
+  target.dispatchEvent(event);
+  if (current !== 0) {
+    setTimeout(() => target.dispatchEvent(event),  100);
+  }
+};
+
 const checker_event = (e) => {
   const key = e.which;
-  if (49 <= key && key <= 57) { // number
-    change_color(key - 48);
+  if (48 <= key && key <= 57) { // number
+    const color = key - 48;
+    const circle = $(circles[current]);
+    const target = circles[current].getElementsByTagName('a')[0];
+    const matches = $('.circlecut-overlay-favorite', circle).attr('class').match(/favorite-backgroundcolor-(.)/);
+
+    const fav = matches ? Number(matches[1]) : 0;
+
+    if (color === fav)
+      return;
+    if (color === 0) {
+      removeCheck(target, fav);
+    } else {
+      addCheck(target, color, fav);
+    }
   }
 };
 
