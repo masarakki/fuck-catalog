@@ -1,8 +1,11 @@
 import $ from 'jquery';
+import _ from 'lodash';
+import keycode from 'keycode';
 
 $("<button>").text("show/hide header").prependTo($("body")).on('click', () => {
   $(".m-header").toggle();
 });
+
 $(".m-header").hide();
 $(".m-headitem").hide();
 $(".m-pr").hide();
@@ -18,86 +21,78 @@ $(".m-footer").hide();
 const circles = $(".cut-tile");
 let current = 0;
 
-let pagination = {};
-$(".m-pagination-nav > a").each((idx, link) => {
-  if ($(link).text() == '次>') {
-    pagination['next'] = $(link).attr('href');
-  }
-  if ($(link).text() == '<前') {
-    pagination['prev'] = $(link).attr('href');
-  }
-});
-
 $("body").on('keydown', e => {
-  let keyCode = e.which;
-  if (!(keyCode >= 37 && keyCode <= 40)) {
-    keyCode = String.fromCharCode(keyCode);
-  }
+  const keyCode = keycode(e.which);
   switch(keyCode) {
-  case "N":
-    move_next();
+  case 'n':
+  case 'j':
+  case 's':
+  case 'down':
+    moveNextPage();
     break;
-  case "P":
-    move_prev();
+  case 'k':
+  case 'w':
+  case 'up':
+  case 'p':
+    movePrevPage();
     break;
-  case "J":
-  case "S":
-  case 40:
-    move_next();
+  case 'h':
+  case 'a':
+  case 'left':
+    movePrevCircle();
     break;
-  case "K":
-  case "W":
-  case 38:
-    move_prev();
-    break;
-  case "H":
-  case "A":
-  case 37:
-    move_cursor(-1); // left
-    break;
-  case "L":
-  case "D":
-  case 39:
-    move_cursor(+1); // right
+  case 'l':
+  case 'd':
+  case 'right':
+    moveNextCircle();
     break;
   }
-  checker_event(e);
-});
 
-$('body').on('keyup', e => {
-  const key = e.which;
-  if (48 <= key && key <= 57) { // number
-    e.preventDefault();
-    e.stopPropagation();
+  if (keyCode == 'esc') {
+    checkCircle(0);
+  } else {
+    checkCircle(Number(keyCode));
   }
 });
 
-const move_next = () => {
-  if (pagination['next']) {
-    window.location = pagination['next'];
+const moveTo = (text) => {
+  const target = _.find($('.m-pagination-nav > a'), x => $(x).text() === text);
+  if (target) {
+    window.location = $(target).attr('href');
   }
 };
 
-const move_prev = () => {
-  if (pagination['prev']) {
-    window.location = pagination['prev'];
-  }
-};
+const movePrevPage = () => moveTo('<前');
 
-const cursor = () => {
+const moveNextPage = () => moveTo('次>');
+
+const movePrevCircle = () => moveCursor(-1);
+
+const moveNextCircle = () => moveCursor(1);
+
+const renderCursor = () => {
   $(".cut-tile").css("border-color", "#030404");
   $(circles[current]).css("border-color", "#ff0000");
 };
 
-const move_cursor = (dir) => {
+const moveCursor = (dir) => {
   current += dir;
   if (current < 0) {
-    return move_prev();
+    movePrevPage();
+  } else if (current >= circles.length) {
+    moveNextPage();
+  } else {
+    renderCursor();
   }
-  if (current >= circles.length) {
-    return move_next();
+};
+
+const addCheck = (target, color, current) => {
+  const event = new Event('contextmenu');
+  changeColor(color);
+  target.dispatchEvent(event);
+  if (current !== 0) {
+    setTimeout(() => target.dispatchEvent(event),  100);
   }
-  cursor();
 };
 
 const removeCheck = (target, current) => {
@@ -107,19 +102,8 @@ const removeCheck = (target, current) => {
   }
 };
 
-const addCheck = (target, color, current) => {
-  const event = new Event('contextmenu');
-  change_color(color);
-  target.dispatchEvent(event);
-  if (current !== 0) {
-    setTimeout(() => target.dispatchEvent(event),  100);
-  }
-};
-
-const checker_event = (e) => {
-  const key = e.which;
-  if (48 <= key && key <= 57) { // number
-    const color = key - 48;
+const checkCircle = (color) => {
+  if (!isNaN(color)) {
     const circle = $(circles[current]);
     const target = circles[current].getElementsByTagName('a')[0];
     const matches = $('.circlecut-overlay-favorite', circle).attr('class').match(/favorite-backgroundcolor-(.)/);
@@ -136,7 +120,7 @@ const checker_event = (e) => {
   }
 };
 
-const change_color = (color) => {
+const changeColor = (color) => {
   $(`input[name='favorite-color'][value='${color}']`).click();
 };
 
@@ -145,4 +129,4 @@ circles.on('click', 'a', (e) => {
   e.preventDefault();
 });
 
-cursor();
+renderCursor();
